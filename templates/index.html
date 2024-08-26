@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manta Surf Forecast</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #e0f7fa;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #00796b;
+        }
+        p {
+            color: #004d40;
+        }
+        .button {
+            background-color: #00796b;
+            border: none;
+            color: white;
+            padding: 15px 32px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
+        .button:hover {
+            background-color: #004d40;
+        }
+        #map {
+            height: 500px;
+            width: 100%;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Mantaray Social Surf Forecast</h1>
+    <div id="map"></div>
+    
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <script>
+        var map = L.map('map').setView([-38.322, 144.797], 10); // Coordinates for Mornington Peninsula
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+        }).addTo(map);
+
+        // Example surf locations with coordinates
+        var locations = [
+            {lat: -38.33593, lng: 144.70531, name: 'Portsea Surf Beach', page: 'portsea.html'},
+            {lat: -38.34569, lng: 144.72736, name: 'Sorrento Back Beach', page: 'sorrento.html'},
+            {lat: -38.40161, lng: 144.80208, name: 'Rye Ocean Beach', page: 'rye.html'},
+            {lat: -38.45931, lng: 144.8707, name: 'Gunnamatta Ocean Beach', page: 'gunnamatta.html'}
+        ];
+
+        locations.forEach(function(location) {
+            L.marker([location.lat, location.lng]).addTo(map)
+                .bindPopup('<b>' + location.name + '</b><br><a href="' + location.page + '">Check surf metrics</a>');
+        });
+    </script>
+</body>
+</html>
