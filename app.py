@@ -32,7 +32,7 @@ def closest_point():
     try:
         # Load coastline data from the static folder
         static_folder = app.static_folder
-        with open(os.path.join(static_folder, 'filtered_coastlines.json')) as f:
+        with open(os.path.join(static_folder, 'interpolated_coastlines.json')) as f:
             coastlines_data = json.load(f)
     except FileNotFoundError:
         return jsonify({'error': 'Coastline data file not found'}), 500
