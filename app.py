@@ -31,6 +31,10 @@ def get_hemisphere(lat, lon):
 def home():
     return render_template('index.html')
 
+@app.route('/map')
+def map_page():
+    return render_template('map.html')
+
 @app.route('/closest_point', methods=['GET'])
 def closest_point():
     try:

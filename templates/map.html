@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mantaray Social Surf Forecast - Map</title>
+    <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css' rel='stylesheet' />
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden; /* Ensure no scrollbars */
+        }
+        #map {
+            width: 100vw;
+            height: 100vh;
+            border: none;
+        }
+        #coords {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            color: #004d40;
+            z-index: 1; /* Ensure it stays on top of the map */
+        }
+        #back-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #004d40;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            z-index: 1; /* Ensure it stays on top of the map */
+        }
+        #back-button:hover {
+            background-color: #003d2e;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="coords">Click on the map to get the coordinates.</div>
+    <div id="back-button" onclick="window.location.href='/'">Back to Landing Page</div>
+
+    <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
+    <script src='https://unpkg.com/@turf/turf/turf.min.js'></script> <!-- Turf.js for distance calculation -->
+    <script>
+        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtZHAiLCJhIjoiY20wYzJ5ZGh4MGZxbDJzb2Y1bmo4cjY0bSJ9.videznhMMGWJuY9_6QKMpA';
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/satellite-streets-v11',
+            center: [0, 0],
+            zoom: 2
+        });
+
+        var marker = new mapboxgl.Marker();  // Create a marker instance
+
+        map.on('load', function () {
+            map.addSource('coastlines', {
+                'type': 'geojson',
+                'data': '/static/interpolated_coastlines.json' // Updated path
+            });
+
+            map.addLayer({
+                'id': 'coastlines-layer',
+                'type': 'line',
+                'source': 'coastlines',
+                'layout': {},
+                'paint': {
+                    'line-color': '#ff0000',
+                    'line-width': 2
+                }
+            });
+        });
+
+        map.on('click', function(e) {
+            const lng = e.lngLat.lng.toFixed(5);
+            const lat = e.lngLat.lat.toFixed(5);
+
+            document.getElementById('coords').textContent = `Clicked Latitude: ${lat}, Longitude: ${lng}`;
+
+            fetch(`/closest_point?lng=${lng}&lat=${lat}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.lat && data.lng) {
+                        document.getElementById('coords').textContent +=
+                            ` | Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`;
+
+                        // Update the marker position
+                        marker.setLngLat([data.lng, data.lat])
+                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`))
+                            .addTo(map)
+                            .togglePopup();
+                    } else {
+                        document.getElementById('coords').textContent += ' | No coastline data available';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('coords').textContent += ' | Error retrieving coastline data';
+                    console.error('Error fetching closest point:', error);
+                });
+        });
+    </script>
+</body>
+</html>
