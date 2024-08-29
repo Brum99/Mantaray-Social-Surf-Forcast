@@ -1,7 +1,7 @@
-# utils.py
 import json
 from flask import jsonify
 from math import sin, cos, sqrt, atan2, radians
+import os
 
 def calculate_distance(lat1, lon1, lat2, lon2):
     # Convert latitude and longitude from degrees to radians
@@ -30,13 +30,16 @@ def closest_point(lng, lat, search_radius=100):
     user_hemisphere = get_hemisphere(lat, lng)
     hemisphere_file = f'static/coastlines_{user_hemisphere}.json'
     
+    # Print the path to debug
+    print(f"Loading data from: {hemisphere_file}")
+
     try:
         with open(hemisphere_file) as f:
             coastlines_data = json.load(f)
     except FileNotFoundError:
-        return jsonify({'error': 'Coastline data file not found'}), 500
+        return {'error': 'Coastline data file not found'}, 500
     except json.JSONDecodeError:
-        return jsonify({'error': 'Error decoding coastline data'}), 500
+        return {'error': 'Error decoding coastline data'}, 500
 
     closest_point = None
     min_distance = float('inf')
@@ -51,10 +54,12 @@ def closest_point(lng, lat, search_radius=100):
                     min_distance = distance
                     closest_point = coord
 
+    # Print debug info
     if closest_point:
+        print(f"Closest point found: {closest_point}")
         return {
             'lat': closest_point[1],
             'lng': closest_point[0]
-        }
+        }, 200
     else:
         return {'error': f'No coastline data available within {search_radius} km'}, 404
