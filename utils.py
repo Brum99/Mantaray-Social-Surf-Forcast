@@ -1,26 +1,31 @@
-from flask import Flask, render_template, request, jsonify
+# utils.py
 import json
-from utils import calculate_distance, get_hemisphere
-from database import query_all_users
+from flask import jsonify
+from math import sin, cos, sqrt, atan2, radians
 
-app = Flask(__name__)
+def calculate_distance(lat1, lon1, lat2, lon2):
+    # Convert latitude and longitude from degrees to radians
+    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+    
+    # Haversine formula to calculate the distance
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
+    distance = 6371 * c  # Radius of Earth in kilometers
+    return distance
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+def get_hemisphere(lat, lon):
+    if lat >= 0 and lon >= 0:
+        return "NE"  # Northern Hemisphere and Eastern Hemisphere
+    elif lat >= 0 and lon < 0:
+        return "NW"  # Northern Hemisphere and Western Hemisphere
+    elif lat < 0 and lon >= 0:
+        return "SE"  # Southern Hemisphere and Eastern Hemisphere
+    else:
+        return "SW"  # Southern Hemisphere and Western Hemisphere
 
-@app.route('/map')
-def map_page():
-    return render_template('map.html')
-
-@app.route('/closest_point', methods=['GET'])
-def closest_point():
-    try:
-        lng = float(request.args.get('lng'))
-        lat = float(request.args.get('lat'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid latitude or longitude'}), 400
-
+def closest_point(lng, lat, search_radius=100):
     # Determine which hemisphere file to load
     user_hemisphere = get_hemisphere(lat, lng)
     hemisphere_file = f'static/coastlines_{user_hemisphere}.json'
@@ -33,8 +38,6 @@ def closest_point():
     except json.JSONDecodeError:
         return jsonify({'error': 'Error decoding coastline data'}), 500
 
-    # Define the search radius in kilometers (e.g., 100 km)
-    search_radius = 100
     closest_point = None
     min_distance = float('inf')
 
@@ -49,12 +52,9 @@ def closest_point():
                     closest_point = coord
 
     if closest_point:
-        return jsonify({
+        return {
             'lat': closest_point[1],
             'lng': closest_point[0]
-        })
+        }
     else:
-        return jsonify({'error': f'No coastline data available within {search_radius} km'}), 404
-
-if __name__ == '__main__':
-    app.run(debug=True)
+        return {'error': f'No coastline data available within {search_radius} km'}, 404
