@@ -1,31 +1,70 @@
-from flask import Flask, render_template, request, jsonify
-import json
-from math import sin, cos, sqrt, atan2, radians
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import mysql.connector
 import os
+from werkzeug.security import generate_password_hash, check_password_hash
+from dotenv import load_dotenv
+
+load_dotenv()  # Load environment variables from .env file
 
 app = Flask(__name__)
+app.secret_key = os.urandom(24)  # Used for session management
 
-def calculate_distance(lat1, lon1, lat2, lon2):
-    # Convert latitude and longitude from degrees to radians
-    lat1, lon1, lat2, lon2 = map(radians, [lat1, lon1, lat2, lon2])
+def get_db_connection():
+    connection = mysql.connector.connect(
+        user=os.getenv('DB_USER'),
+        password=os.getenv('DB_PASSWORD'),
+        host='localhost',
+        database=os.getenv('DB_NAME')
+    )
+    return connection
+
+@app.route('/sign_up', methods=['GET', 'POST'])
+def sign_up():
+    if request.method == 'POST':
+        username = request.form['username']
+        email = request.form['email']
+        password = request.form['password']
+        hashed_password = generate_password_hash(password)  # No method specified
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)",
+                       (username, email, hashed_password))
+        conn.commit()
+        cursor.close()
+        conn.close()
+        flash('Account created successfully. You can now log in.')
+        return redirect(url_for('login'))
     
-    # Haversine formula to calculate the distance
-    dlat = lat2 - lat1
-    dlon = lon2 - lon1
-    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1 - a))
-    distance = 6371 * c  # Radius of Earth in kilometers
-    return distance
+    return render_template('sign_up.html')
 
-def get_hemisphere(lat, lon):
-    if lat >= 0 and lon >= 0:
-        return "NE"  # Northern Hemisphere and Eastern Hemisphere
-    elif lat >= 0 and lon < 0:
-        return "NW"  # Northern Hemisphere and Western Hemisphere
-    elif lat < 0 and lon >= 0:
-        return "SE"  # Southern Hemisphere and Eastern Hemisphere
-    else:
-        return "SW"  # Southern Hemisphere and Western Hemisphere
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form['username']
+        password = request.form['password']
+        
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT password_hash FROM users WHERE username = %s", (username,))
+        result = cursor.fetchone()
+        cursor.close()
+        conn.close()
+        
+        if result and check_password_hash(result[0], password):
+            session['user'] = username
+            flash('Logged in successfully.')
+            return redirect(url_for('home'))
+        else:
+            flash('Invalid credentials. Please try again.')
+    
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    session.pop('user', None)
+    flash('You have been logged out.')
+    return redirect(url_for('login'))
 
 @app.route('/')
 def home():
@@ -34,49 +73,6 @@ def home():
 @app.route('/map')
 def map_page():
     return render_template('map.html')
-
-@app.route('/closest_point', methods=['GET'])
-def closest_point():
-    try:
-        lng = float(request.args.get('lng'))
-        lat = float(request.args.get('lat'))
-    except (TypeError, ValueError):
-        return jsonify({'error': 'Invalid latitude or longitude'}), 400
-
-    # Determine which hemisphere file to load
-    user_hemisphere = get_hemisphere(lat, lng)
-    hemisphere_file = f'static/coastlines_{user_hemisphere}.json'
-    
-    try:
-        with open(hemisphere_file) as f:
-            coastlines_data = json.load(f)
-    except FileNotFoundError:
-        return jsonify({'error': 'Coastline data file not found'}), 500
-    except json.JSONDecodeError:
-        return jsonify({'error': 'Error decoding coastline data'}), 500
-
-    # Define the search radius in kilometers (e.g., 100 km)
-    search_radius = 100
-    closest_point = None
-    min_distance = float('inf')
-
-    # Loop through each feature and calculate the closest point in the same hemisphere within the search radius
-    for feature in coastlines_data['features']:
-        if feature['geometry']['type'] == 'LineString':
-            for coord in feature['geometry']['coordinates']:
-                coord_lng, coord_lat = coord
-                distance = calculate_distance(lat, lng, coord_lat, coord_lng)
-                if distance <= search_radius and distance < min_distance:
-                    min_distance = distance
-                    closest_point = coord
-
-    if closest_point:
-        return jsonify({
-            'lat': closest_point[1],
-            'lng': closest_point[0]
-        })
-    else:
-        return jsonify({'error': f'No coastline data available within {search_radius} km'}), 404
 
 if __name__ == '__main__':
     app.run(debug=True)
