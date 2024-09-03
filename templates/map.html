@@ -43,12 +43,30 @@
         #back-button:hover {
             background-color: #003d2e;
         }
+        #login-status {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            z-index: 1; /* Ensure it stays on top of the map */
+        }
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div id="coords">Click on the map to get the coordinates.</div>
     <div id="back-button" onclick="window.location.href='/'">Back to Landing Page</div>
+    <div id="login-status">
+        {% if current_user.is_authenticated %}
+            Logged in as {{ current_user.username }}.
+            <a href="{{ url_for('logout') }}" id="logout-button" style="background-color: #004d40; color: white; padding: 10px; border-radius: 5px; cursor: pointer; font-size: 18px; text-decoration: none;">Logout</a>
+        {% else %}
+            You are not logged in.
+        {% endif %}
+    </div>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
     <script src='https://unpkg.com/@turf/turf/turf.min.js'></script> <!-- Turf.js for distance calculation -->

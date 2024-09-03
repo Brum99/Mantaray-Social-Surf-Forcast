@@ -60,6 +60,7 @@ class User(UserMixin):
             return User(*user_data)
         return None
 
+
 @login_manager.user_loader
 def load_user(user_id):
     return User.get(user_id)
@@ -119,11 +120,19 @@ def sign_up():
         cursor.execute("INSERT INTO users (username, email, password_hash) VALUES (%s, %s, %s)", 
                        (username, email, password_hash))
         connection.commit()
+
+        # Fetch the newly created user's id
+        cursor.execute("SELECT id FROM users WHERE username = %s", (username,))
+        user_id = cursor.fetchone()[0]
         cursor.close()
         connection.close()
 
-        flash('Account created successfully! Please log in.')
-        return redirect(url_for('login'))
+        # Log in the new user
+        new_user = User.get(user_id)
+        login_user(new_user)
+
+        # Redirect to the map page
+        return redirect(url_for('map_page'))
 
     return render_template('sign_up.html')
 
