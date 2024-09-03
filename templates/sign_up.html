@@ -5,45 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up - Mantaray Social Surf Forecast</title>
     <style>
-        body {
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
             font-family: Arial, sans-serif;
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            background-color: #e0f7fa;
         }
-        .container {
+        .background-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-image: url('/static/images/BeachBouy.jpg');
+            background-size: cover;
+            background-position: center;
+            z-index: -1; /* Keeps the image in the background */
+        }
+        .overlay {
+            position: relative;
+            background-color: rgba(255, 255, 255, 0.85); /* Transparent white */
+            padding: 40px;
+            border-radius: 10px;
             text-align: center;
+            width: 400px;
+            box-sizing: border-box;
         }
-        .form-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .input, .button {
-            background-color: #004d40;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            font-size: 16px;
-            width: 100%; /* Ensures input fields and buttons take the full width of the container */
-            max-width: 200px; /* Limits the width */
-            margin: 10px auto; /* Center-aligns and adds margin */
-            display: block;
+        h1 {
+            color: #004d40;
+            margin-bottom: 30px;
+            font-size: 24px;
         }
         .input {
             background-color: white;
             color: black;
-            border: 2px solid black; /* Adds black border around input fields */
-            box-sizing: border-box; /* Ensures padding and border are included in the width */
+            padding: 10px;
+            border: 2px solid black;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
+            box-sizing: border-box;
         }
         .button {
             background-color: #004d40;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+            max-width: 300px;
+            margin: 10px auto;
             text-align: center;
+            display: inline-block;
             text-decoration: none;
+            box-sizing: border-box;
         }
         .button:hover {
             background-color: #003d2e;
@@ -54,7 +73,8 @@
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="background-image"></div>
+    <div class="overlay">
         <h1>Sign Up for Mantaray Social Surf Forecast</h1>
         <div class="form-container">
             <form action="/signup" method="POST">
