@@ -96,7 +96,21 @@
         input:checked + .slider:before {
             transform: translateX(16px);
         }
-
+        #get-surf-report-container {
+            position: absolute;
+            left: 20px;
+            top: 120px; /* Adjusted top position to move it lower */
+            z-index: 1; /* Ensure it stays on top of other elements */
+        }
+        #get-surf-report {
+            background-color: #004d40;
+            color: white;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+        }
     </style>
 </head>
 <body>
@@ -118,6 +132,11 @@
                 <span class="slider"></span>
             </label>
         </div>
+    </div>
+    <div id="get-surf-report-container">
+        <button id="get-surf-report">
+            Get Surf Report
+        </button>
     </div>
     <div id="mantaray">Mantaray</div>
 
