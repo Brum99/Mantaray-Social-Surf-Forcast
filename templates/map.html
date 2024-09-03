@@ -28,21 +28,6 @@
             color: #004d40;
             z-index: 1; /* Ensure it stays on top of the map */
         }
-        #back-button {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: #004d40;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 18px;
-            z-index: 1; /* Ensure it stays on top of the map */
-        }
-        #back-button:hover {
-            background-color: #003d2e;
-        }
         #login-status {
             position: absolute;
             top: 20px;
@@ -53,12 +38,70 @@
             border-radius: 5px;
             z-index: 1; /* Ensure it stays on top of the map */
         }
+        .toggle-switch-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 10px;
+            border: 2px solid #004d40;
+            border-radius: 5px;
+            z-index: 1;
+        }
+        .toggle-switch {
+            display: flex;
+            align-items: center;
+        }
+        .switch-label {
+            margin-right: 10px;
+            color: #004d40;
+            font-size: 18px;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 40px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+        }
+        input:checked + .slider {
+            background-color: #004d40;
+        }
+        input:checked + .slider:before {
+            transform: translateX(16px);
+        }
+
     </style>
 </head>
 <body>
     <div id="map"></div>
     <div id="coords">Click on the map to get the coordinates.</div>
-    <div id="back-button" onclick="window.location.href='/'">Back to Landing Page</div>
     <div id="login-status">
         {% if current_user.is_authenticated %}
             Logged in as {{ current_user.username }}.
@@ -67,6 +110,16 @@
             You are not logged in.
         {% endif %}
     </div>
+    <div class="toggle-switch-container">
+        <div class="toggle-switch">
+            <span class="switch-label">Coastline Outline</span>
+            <label class="switch">
+                <input type="checkbox" id="toggle-coastline">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </div>
+    <div id="mantaray">Mantaray</div>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
     <script src='https://unpkg.com/@turf/turf/turf.min.js'></script> <!-- Turf.js for distance calculation -->
@@ -81,6 +134,7 @@
         });
 
         var marker = new mapboxgl.Marker();  // Create a marker instance
+        var coastlineLayerVisible = false; // Track the visibility state
 
         map.on('load', function () {
             map.addSource('coastlines', {
@@ -98,6 +152,13 @@
                     'line-width': 2
                 }
             });
+
+            map.setLayoutProperty('coastlines-layer', 'visibility', 'none'); // Initially hide the layer
+        });
+
+        document.getElementById('toggle-coastline').addEventListener('change', function() {
+            coastlineLayerVisible = !coastlineLayerVisible;
+            map.setLayoutProperty('coastlines-layer', 'visibility', coastlineLayerVisible ? 'visible' : 'none');
         });
 
         map.on('click', function(e) {
