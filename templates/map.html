@@ -96,6 +96,17 @@
         input:checked + .slider:before {
             transform: translateX(16px);
         }
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: transparent;
+            border: none;
+            font-size: 20px;
+            color: #004d40;
+            cursor: pointer;
+            z-index: 3; /* Ensure it stays on top of the panel */
+        }
         #get-surf-report-container {
             position: absolute;
             left: 20px;
@@ -159,6 +170,7 @@
         </button>
     </div>
     <div id="coastline-info">
+        <button id="close-coastline-info" class="close-btn">X</button>
         <h2>Closest Coastline Information</h2>
         <p id="coastline-coords"></p>
         <p id="additional-info">You can add more details here if needed.</p>
@@ -227,7 +239,7 @@
                             .addTo(map)
                             .togglePopup();
                     } else {
-                        document.getElementById('coords').textContent += ' | No coastline data available';
+                        document.getElementById('coords').textContent += ' | Not close enough to a coastline';
                         closestCoastline = null;
                     }
                 })
@@ -250,6 +262,10 @@
                 alert('No coastline data available. Please click on the map first.');
             }
         });
+        document.getElementById('close-coastline-info').addEventListener('click', function() {
+            document.getElementById('coastline-info').style.display = 'none';
+        });
+
     </script>
 </body>
 </html>
