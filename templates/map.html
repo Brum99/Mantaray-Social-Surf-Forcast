@@ -111,6 +111,41 @@
             cursor: pointer;
             font-size: 18px;
         }
+        #coastline-info {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 30%;
+            height: 100%;
+            background-color: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            display: none; /* Initially hidden */
+            z-index: 2; /* Ensure it overlays the map */
+            box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
+        }
+        #coastline-info h2 {
+            color: #004d40;
+            margin: 0 0 10px;
+        }
+        #coastline-info p {
+            font-size: 16px;
+            color: #333;
+        }
+        #close-coastline-info {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: #004d40;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            text-align: center;
+            line-height: 30px;
+            cursor: pointer;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -138,7 +173,12 @@
             Get Surf Report
         </button>
     </div>
-    <div id="mantaray">Mantaray</div>
+    <div id="coastline-info">
+        <button id="close-coastline-info">X</button>
+        <h2>Closest Coastline Information</h2>
+        <p id="coastline-coords"></p>
+        <p id="additional-info">You can add more details here if needed.</p>
+    </div>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
     <script src='https://unpkg.com/@turf/turf/turf.min.js'></script> <!-- Turf.js for distance calculation -->
@@ -154,6 +194,7 @@
 
         var marker = new mapboxgl.Marker();  // Create a marker instance
         var coastlineLayerVisible = false; // Track the visibility state
+        var closestCoastline = null; // Store the closest coastline data
 
         map.on('load', function () {
             map.addSource('coastlines', {
@@ -193,19 +234,31 @@
                         document.getElementById('coords').textContent +=
                             ` | Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`;
 
+                        // Store the closest coastline data
+                        closestCoastline = { lat: data.lat.toFixed(5), lng: data.lng.toFixed(5) };
+
                         // Update the marker position
                         marker.setLngLat([data.lng, data.lat])
-                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`))
-                            .addTo(map)
-                            .togglePopup();
+                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h3>Closest Coastline</h3><p>Lat: ${data.lat.toFixed(5)}, Lng: ${data.lng.toFixed(5)}</p>`))
+                            .addTo(map);
                     } else {
-                        document.getElementById('coords').textContent += ' | No coastline data available';
+                        console.error('Failed to get closest coastline data');
                     }
                 })
-                .catch(error => {
-                    document.getElementById('coords').textContent += ' | Error retrieving coastline data';
-                    console.error('Error fetching closest point:', error);
-                });
+                .catch(error => console.error('Error:', error));
+        });
+
+        document.getElementById('get-surf-report').addEventListener('click', function() {
+            if (closestCoastline) {
+                document.getElementById('coastline-info').style.display = 'block'; // Show the pop-out page
+                document.getElementById('coastline-coords').textContent = `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
+            } else {
+                alert('Please click on the map to find the closest coastline first.');
+            }
+        });
+
+        document.getElementById('close-coastline-info').addEventListener('click', function() {
+            document.getElementById('coastline-info').style.display = 'none'; // Close the pop-out page
         });
     </script>
 </body>
