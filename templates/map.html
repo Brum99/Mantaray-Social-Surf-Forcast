@@ -131,21 +131,6 @@
             font-size: 16px;
             color: #333;
         }
-        #close-coastline-info {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: #004d40;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            text-align: center;
-            line-height: 30px;
-            cursor: pointer;
-            font-size: 16px;
-        }
     </style>
 </head>
 <body>
@@ -174,7 +159,6 @@
         </button>
     </div>
     <div id="coastline-info">
-        <button id="close-coastline-info">X</button>
         <h2>Closest Coastline Information</h2>
         <p id="coastline-coords"></p>
         <p id="additional-info">You can add more details here if needed.</p>
@@ -239,26 +223,32 @@
 
                         // Update the marker position
                         marker.setLngLat([data.lng, data.lat])
-                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`<h3>Closest Coastline</h3><p>Lat: ${data.lat.toFixed(5)}, Lng: ${data.lng.toFixed(5)}</p>`))
-                            .addTo(map);
+                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`))
+                            .addTo(map)
+                            .togglePopup();
                     } else {
-                        console.error('Failed to get closest coastline data');
+                        document.getElementById('coords').textContent += ' | No coastline data available';
+                        closestCoastline = null;
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    document.getElementById('coords').textContent += ' | Error fetching closest coastline data';
+                    console.error(error);
+                    closestCoastline = null;
+                });
         });
 
         document.getElementById('get-surf-report').addEventListener('click', function() {
             if (closestCoastline) {
-                document.getElementById('coastline-info').style.display = 'block'; // Show the pop-out page
-                document.getElementById('coastline-coords').textContent = `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
-            } else {
-                alert('Please click on the map to find the closest coastline first.');
-            }
-        });
+                // Display the coastline information panel
+                document.getElementById('coastline-info').style.display = 'block';
 
-        document.getElementById('close-coastline-info').addEventListener('click', function() {
-            document.getElementById('coastline-info').style.display = 'none'; // Close the pop-out page
+                // Update the content in the coastline info panel
+                document.getElementById('coastline-coords').textContent =
+                    `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
+            } else {
+                alert('No coastline data available. Please click on the map first.');
+            }
         });
     </script>
 </body>
