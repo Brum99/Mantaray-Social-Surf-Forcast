@@ -266,6 +266,68 @@
             document.getElementById('coastline-info').style.display = 'none';
         });
 
+        document.getElementById('get-surf-report').addEventListener('click', function() {
+            if (closestCoastline) {
+                // Display the coastline information panel
+                document.getElementById('coastline-info').style.display = 'block';
+
+                // Update the content in the coastline info panel
+                document.getElementById('coastline-coords').textContent =
+                    `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
+
+                // Prompt user for location name
+                let locationName = prompt("Enter a name for this location:", "Unnamed Location");
+                if (locationName === null) {
+                    return; // User cancelled the prompt
+                }
+
+                // First, save the location
+                fetch('/save_location', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        latitude: closestCoastline.lat,
+                        longitude: closestCoastline.lng,
+                        name: locationName
+                    }),
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Location saved successfully, now fetch and save weather data
+                        return fetch('/fetch_and_save_weather', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                latitude: closestCoastline.lat,
+                                longitude: closestCoastline.lng,
+                                location_id: data.location_id
+                            }),
+                        });
+                    } else {
+                        throw new Error('Failed to save location. ' + data.message);
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        alert('Location and weather data saved successfully!');
+                    } else {
+                        alert('Failed to save weather data. ' + data.message);
+                    }
+                })
+                .catch((error) => {
+                    console.error('Error:', error);
+                    alert('An error occurred while saving the location or weather data.');
+                });
+            } else {
+                alert('No coastline data available. Please click on the map first.');
+            }
+        });
     </script>
 </body>
 </html>
