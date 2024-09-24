@@ -24,8 +24,8 @@ def process_geojson(input_file, output_file, num_points=3):
         json.dump(data, f, indent=2)
 
 # Define file paths within the static folder
-input_path = 'static/filtered_coastlines.json'
-output_path = 'static/interpolated_coastlines.json'
+input_path = 'static/json/filtered_coastlines.json'
+output_path = 'static/json/interpolated_coastlines.json'
 
 # Process the GeoJSON file
 process_geojson(input_path, output_path, num_points=3)

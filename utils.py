@@ -28,7 +28,7 @@ def get_hemisphere(lat, lon):
 def closest_point(lng, lat, search_radius=100):
     # Determine which hemisphere file to load
     user_hemisphere = get_hemisphere(lat, lng)
-    hemisphere_file = f'static/coastlines_{user_hemisphere}.json'
+    hemisphere_file = f'static/json/coastlines_{user_hemisphere}.json'
     
     # Print the path to debug
     print(f"Loading data from: {hemisphere_file}")

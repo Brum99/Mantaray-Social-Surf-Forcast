@@ -13,6 +13,7 @@ import arrow
 import requests
 from sqlalchemy import create_engine
 from sqlalchemy.exc import SQLAlchemyError
+import os
 
 # Initialize Flask app
 app = Flask(__name__)
@@ -197,11 +198,11 @@ def fetch_and_save_weather():
             'end': end.timestamp(),
         }
         
-        api_key = 'c15418b8-73d7-11ef-9acf-0242ac130004-c1541912-73d7-11ef-9acf-0242ac130004'
+      
 
         # Fetch sea level and weather data
-        sea_level_data = fetch_data('tide/sea-level', params, api_key)
-        weather_data = fetch_data('weather', params, api_key, extra_params={
+        sea_level_data = fetch_data('tide/sea-level', params)
+        weather_data = fetch_data('weather', params,  extra_params={
             'params': 'windSpeed,windDirection,swellDirection,swellPeriod,swellHeight,waveHeight,wavePeriod,waterTemperature,airTemperature'
         })
 
@@ -332,15 +333,24 @@ def fetch_and_save_weather():
         return jsonify({'success': False, 'message': f'An unexpected error occurred: {str(e)}'}), 500
 
 # Helper function to fetch data from API
-def fetch_data(endpoint, params, api_key, extra_params=None):
+def fetch_data(endpoint, params, extra_params=None):
     url = f'https://api.stormglass.io/v2/{endpoint}/point'
     all_params = {**params, **(extra_params or {})}
-    response = requests.get(
-        url,
-        params=all_params,
-        headers={'Authorization': api_key}
-    )
+    
+    # Try using the primary API key first
+    api_key = Config.SECRET_KEY1
+    response = requests.get(url, params=all_params, headers={'Authorization': api_key})
+
+    # Check if the response indicates the primary key is exhausted
+    if response.status_code == 429:  # Rate limit exceeded
+        print("Primary API key exhausted, switching to secondary key.")
+        # Switch to the secondary API key
+        api_key = Config.SECRET_KEY2
+        response = requests.get(url, params=all_params, headers={'Authorization': api_key})
+
+    # Raise an error if the response is still not successful
     response.raise_for_status()
+    
     return response.json()
 
 if __name__ == '__main__':

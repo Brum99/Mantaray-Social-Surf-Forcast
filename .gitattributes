@@ -1,2 +1,2 @@
-static/filtered_coastlines.json filter=lfs diff=lfs merge=lfs -text
-static/interpolated_coastlines.json filter=lfs diff=lfs merge=lfs -text
+static/json/filtered_coastlines.json filter=lfs diff=lfs merge=lfs -text
+static/json/interpolated_coastlines.json filter=lfs diff=lfs merge=lfs -text

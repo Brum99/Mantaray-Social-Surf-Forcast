@@ -77,18 +77,18 @@ def split_coastline_data(coastline_data):
     return {'NE': NE, 'NW': NW, 'SE': SE, 'SW': SW}
 
 # Load the original coastline data
-with open('static/interpolated_coastlines.json') as f:
+with open('static/json/interpolated_coastlines.json') as f:
     coastline_data = json.load(f)
 
 # Split the data
 split_data = split_coastline_data(coastline_data)
 
 # Save the split data to separate files
-with open('static/coastlines_NE.json', 'w') as f:
+with open('static/json/coastlines_NE.json', 'w') as f:
     json.dump({'type': 'FeatureCollection', 'features': split_data['NE']}, f)
-with open('static/coastlines_NW.json', 'w') as f:
+with open('static/json/coastlines_NW.json', 'w') as f:
     json.dump({'type': 'FeatureCollection', 'features': split_data['NW']}, f)
-with open('static/coastlines_SE.json', 'w') as f:
+with open('static/json/coastlines_SE.json', 'w') as f:
     json.dump({'type': 'FeatureCollection', 'features': split_data['SE']}, f)
-with open('static/coastlines_SW.json', 'w') as f:
+with open('static/json/coastlines_SW.json', 'w') as f:
     json.dump({'type': 'FeatureCollection', 'features': split_data['SW']}, f)

@@ -5,144 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mantaray Social Surf Forecast - Map</title>
     <link href='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.css' rel='stylesheet' />
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            overflow: hidden; /* Ensure no scrollbars */
-        }
-        #map {
-            width: 100vw;
-            height: 100vh;
-            border: none;
-        }
-        #coords {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border-radius: 5px;
-            font-size: 18px;
-            font-weight: bold;
-            color: #004d40;
-            z-index: 1; /* Ensure it stays on top of the map */
-        }
-        #login-status {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background-color: rgba(0, 0, 0, 0.5);
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            z-index: 1; /* Ensure it stays on top of the map */
-        }
-        .toggle-switch-container {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background-color: rgba(255, 255, 255, 0.8);
-            padding: 10px;
-            border: 2px solid #004d40;
-            border-radius: 5px;
-            z-index: 1;
-        }
-        .toggle-switch {
-            display: flex;
-            align-items: center;
-        }
-        .switch-label {
-            margin-right: 10px;
-            color: #004d40;
-            font-size: 18px;
-        }
-        .switch {
-            position: relative;
-            display: inline-block;
-            width: 40px;
-            height: 24px;
-        }
-        .switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        .slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        .slider:before {
-            position: absolute;
-            content: "";
-            height: 16px;
-            width: 16px;
-            border-radius: 50%;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-        }
-        input:checked + .slider {
-            background-color: #004d40;
-        }
-        input:checked + .slider:before {
-            transform: translateX(16px);
-        }
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: transparent;
-            border: none;
-            font-size: 20px;
-            color: #004d40;
-            cursor: pointer;
-            z-index: 3; /* Ensure it stays on top of the panel */
-        }
-        #get-surf-report-container {
-            position: absolute;
-            left: 20px;
-            top: 120px; /* Adjusted top position to move it lower */
-            z-index: 1; /* Ensure it stays on top of other elements */
-        }
-        #get-surf-report {
-            background-color: #004d40;
-            color: white;
-            padding: 10px;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-            font-size: 18px;
-        }
-        #coastline-info {
-            position: absolute;
-            top: 0;
-            right: 0;
-            width: 30%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            display: none; /* Initially hidden */
-            z-index: 2; /* Ensure it overlays the map */
-            box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
-        }
-        #coastline-info h2 {
-            color: #004d40;
-            margin: 0 0 10px;
-        }
-        #coastline-info p {
-            font-size: 16px;
-            color: #333;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/map.css') }}">
 </head>
 <body>
     <div id="map"></div>
@@ -165,169 +28,68 @@
         </div>
     </div>
     <div id="get-surf-report-container">
-        <button id="get-surf-report">
-            Get Surf Report
-        </button>
+        <button id="get-surf-report">Get Surf Report</button>
     </div>
     <div id="coastline-info">
         <button id="close-coastline-info" class="close-btn">X</button>
         <h2>Closest Coastline Information</h2>
         <p id="coastline-coords"></p>
         <p id="additional-info">You can add more details here if needed.</p>
+    
+        <h2>Forecast</h2>
+        <div class="chart-container">
+            <canvas id="waveHeightChart"></canvas>
+            <canvas id="tideChart"></canvas>
+        </div>
+    
+        <div id="compass-wind-container">
+            <div class="compass-section">
+                <h3>Wind</h3>
+                <div id="compass-wind">
+                    <div id="arrow"></div>
+                    <div id="cardinals">
+                        <div id="n">N</div>
+                        <div id="e">E</div>
+                        <div id="s">S</div>
+                        <div id="w">W</div>
+                    </div>
+                    <div class="line horizontal-line"></div>
+                    <div class="line vertical-line"></div>
+                </div>
+                <div id="wind-metrics">
+                    <div id="wind-speed">Speed: N/A m/s</div>
+                    <div id="wind-direction">Direction: N/A°</div>
+                </div>
+            </div>
+    
+            <div class="compass-section">
+                <h3>Swell</h3>
+                <div id="compass-swell">
+                    <div id="swell-arrow"></div>
+                    <div id="cardinals">
+                        <div id="n">N</div>
+                        <div id="e">E</div>
+                        <div id="s">S</div>
+                        <div id="w">W</div>
+                    </div>
+                    <div class="line horizontal-line"></div>
+                    <div class="line vertical-line"></div>
+                </div>
+                <div id="swell-metrics">
+                    <div id="swell-height">Height: N/A m</div>
+                    <div id="swell-direction">Direction: N/A°</div>
+                </div>
+            </div>
+        </div>
+    
+        <div id="slider-container">
+            <input id="slider" type="range" min="0" step="1" value="0">
+            <div id="time-day-date"></div>
+        </div>
     </div>
 
     <script src='https://api.mapbox.com/mapbox-gl-js/v2.8.2/mapbox-gl.js'></script>
-    <script src='https://unpkg.com/@turf/turf/turf.min.js'></script> <!-- Turf.js for distance calculation -->
-    <script>
-        mapboxgl.accessToken = 'pk.eyJ1Ijoic2FtZHAiLCJhIjoiY20wYzJ5ZGh4MGZxbDJzb2Y1bmo4cjY0bSJ9.videznhMMGWJuY9_6QKMpA';
-
-        var map = new mapboxgl.Map({
-            container: 'map',
-            style: 'mapbox://styles/mapbox/satellite-streets-v11',
-            center: [0, 0],
-            zoom: 2
-        });
-
-        var marker = new mapboxgl.Marker();  // Create a marker instance
-        var coastlineLayerVisible = false; // Track the visibility state
-        var closestCoastline = null; // Store the closest coastline data
-
-        map.on('load', function () {
-            map.addSource('coastlines', {
-                'type': 'geojson',
-                'data': '/static/interpolated_coastlines.json' // Updated path
-            });
-
-            map.addLayer({
-                'id': 'coastlines-layer',
-                'type': 'line',
-                'source': 'coastlines',
-                'layout': {},
-                'paint': {
-                    'line-color': '#ff0000',
-                    'line-width': 2
-                }
-            });
-
-            map.setLayoutProperty('coastlines-layer', 'visibility', 'none'); // Initially hide the layer
-        });
-
-        document.getElementById('toggle-coastline').addEventListener('change', function() {
-            coastlineLayerVisible = !coastlineLayerVisible;
-            map.setLayoutProperty('coastlines-layer', 'visibility', coastlineLayerVisible ? 'visible' : 'none');
-        });
-
-        map.on('click', function(e) {
-            const lng = e.lngLat.lng.toFixed(5);
-            const lat = e.lngLat.lat.toFixed(5);
-
-            document.getElementById('coords').textContent = `Clicked Latitude: ${lat}, Longitude: ${lng}`;
-
-            fetch(`/closest_point?lng=${lng}&lat=${lat}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.lat && data.lng) {
-                        document.getElementById('coords').textContent +=
-                            ` | Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`;
-
-                        // Store the closest coastline data
-                        closestCoastline = { lat: data.lat.toFixed(5), lng: data.lng.toFixed(5) };
-
-                        // Update the marker position
-                        marker.setLngLat([data.lng, data.lat])
-                            .setPopup(new mapboxgl.Popup({ offset: 25 }).setText(`Closest Coastline Latitude: ${data.lat.toFixed(5)}, Longitude: ${data.lng.toFixed(5)}`))
-                            .addTo(map)
-                            .togglePopup();
-                    } else {
-                        document.getElementById('coords').textContent += ' | Not close enough to a coastline';
-                        closestCoastline = null;
-                    }
-                })
-                .catch(error => {
-                    document.getElementById('coords').textContent += ' | Error fetching closest coastline data';
-                    console.error(error);
-                    closestCoastline = null;
-                });
-        });
-
-        document.getElementById('get-surf-report').addEventListener('click', function() {
-            if (closestCoastline) {
-                // Display the coastline information panel
-                document.getElementById('coastline-info').style.display = 'block';
-
-                // Update the content in the coastline info panel
-                document.getElementById('coastline-coords').textContent =
-                    `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
-            } else {
-                alert('No coastline data available. Please click on the map first.');
-            }
-        });
-        document.getElementById('close-coastline-info').addEventListener('click', function() {
-            document.getElementById('coastline-info').style.display = 'none';
-        });
-
-        document.getElementById('get-surf-report').addEventListener('click', function() {
-            if (closestCoastline) {
-                // Display the coastline information panel
-                document.getElementById('coastline-info').style.display = 'block';
-
-                // Update the content in the coastline info panel
-                document.getElementById('coastline-coords').textContent =
-                    `Latitude: ${closestCoastline.lat}, Longitude: ${closestCoastline.lng}`;
-
-                // Prompt user for location name
-                let locationName = prompt("Enter a name for this location:", "Unnamed Location");
-                if (locationName === null) {
-                    return; // User cancelled the prompt
-                }
-
-                // First, save the location
-                fetch('/save_location', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        latitude: closestCoastline.lat,
-                        longitude: closestCoastline.lng,
-                        name: locationName
-                    }),
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        // Location saved successfully, now fetch and save weather data
-                        return fetch('/fetch_and_save_weather', {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                            },
-                            body: JSON.stringify({
-                                latitude: closestCoastline.lat,
-                                longitude: closestCoastline.lng,
-                                location_id: data.location_id
-                            }),
-                        });
-                    } else {
-                        throw new Error('Failed to save location. ' + data.message);
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        alert('Location and weather data saved successfully!');
-                    } else {
-                        alert('Failed to save weather data. ' + data.message);
-                    }
-                })
-                .catch((error) => {
-                    console.error('Error:', error);
-                    alert('An error occurred while saving the location or weather data.');
-                });
-            } else {
-                alert('No coastline data available. Please click on the map first.');
-            }
-        });
-    </script>
+    <script src='https://unpkg.com/@turf/turf/turf.min.js'></script>
+    <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 </body>
 </html>

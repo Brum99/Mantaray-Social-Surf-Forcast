@@ -1,0 +1,137 @@
+
+body {
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Ensure no scrollbars */
+}
+#map {
+    width: 100vw;
+    height: 100vh;
+    border: none;
+}
+#coords {
+    position: absolute;
+    bottom: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #004d40;
+    z-index: 1; /* Ensure it stays on top of the map */
+}
+#login-status {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    z-index: 1; /* Ensure it stays on top of the map */
+}
+.toggle-switch-container {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background-color: rgba(255, 255, 255, 0.8);
+    padding: 10px;
+    border: 2px solid #004d40;
+    border-radius: 5px;
+    z-index: 1;
+}
+.toggle-switch {
+    display: flex;
+    align-items: center;
+}
+.switch-label {
+    margin-right: 10px;
+    color: #004d40;
+    font-size: 18px;
+}
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 24px;
+}
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    border-radius: 50%;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+}
+input:checked + .slider {
+    background-color: #004d40;
+}
+input:checked + .slider:before {
+    transform: translateX(16px);
+}
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background-color: transparent;
+    border: none;
+    font-size: 20px;
+    color: #004d40;
+    cursor: pointer;
+    z-index: 3; /* Ensure it stays on top of the panel */
+}
+#get-surf-report-container {
+    position: absolute;
+    left: 20px;
+    top: 120px; /* Adjusted top position to move it lower */
+    z-index: 1; /* Ensure it stays on top of other elements */
+}
+#get-surf-report {
+    background-color: #004d40;
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+    font-size: 18px;
+}
+#coastline-info {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 30%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 20px;
+    display: none; /* Initially hidden */
+    z-index: 2; /* Ensure it overlays the map */
+    box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.2);
+}
+#coastline-info h2 {
+    color: #004d40;
+    margin: 0 0 10px;
+}
+#coastline-info p {
+    font-size: 16px;
+    color: #333;
+}
