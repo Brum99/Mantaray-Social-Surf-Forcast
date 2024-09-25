@@ -4,16 +4,16 @@ an interactive world map that allows users to explore the coastlines of the worl
 - python, SQL, Java, HTML, CSS
 
 To do list:
- ~~ - Add full sign up and login functionality. DONE~~
+  - ~~Add full sign up and login functionality.~~ DONE
   - Allow users to save their favourite surf spots so that they can access them accross sessions.
   - Allow users to add undiscovered surf spots to the world map.
-  - Save and acess forecasts and locations between sessions.
+  - Save and access forecasts and locations between sessions.
   - Allow users to recommend ideal conditions for a discovered surf location.
   - User profile page.
   - Add Data visualizations. INTEGRATING
   - Tide , Wind direction, wave period, swell direction, wind speed, wave height. INTEGRATING
   - Improve the look of the webpage. ONGOING
-  - Begin a log of surf conditions for saved surf spots. DONE
+  - ~~Begin a log of surf conditions for saved surf spots.~~ DONE
 
 
 
