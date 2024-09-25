@@ -1,7 +1,7 @@
 This application is a personal project that aims to create a surf forcasting webpage that allows users to get realtime surf condition data through stormglass.io APIs for any coastline location in the world. The app has 
 an interactive world map that allows users to explore the coastlines of the world. 
 
-- python, SQL, HTML, Java
+- python, SQL, Java, HTML, CSS
 
 To do list:
   - Add full sign up and login functionality. DONE
@@ -15,6 +15,7 @@ To do list:
   - Look into forcasting. 
   - Get a Mantaray logo.
 
+![Alt text](static/images/homepage.jpg)
 
     
   
