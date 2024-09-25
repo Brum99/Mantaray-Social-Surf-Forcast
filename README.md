@@ -34,7 +34,7 @@ State of the web page (25/09/2024):
 ![templatePage](https://github.com/user-attachments/assets/76284ee7-cb86-43b4-9d25-0d47a9044110)
 
 
-- Visualisation 
+  - Visualisation S
 ![waveVisualisation](https://github.com/user-attachments/assets/f32dfd3c-fd41-43b5-ad0c-a009c3c19c58)
 
   
