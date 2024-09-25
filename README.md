@@ -30,8 +30,9 @@ State of the web page (25/09/2024):
   - Map Page
     -Full view with coastline outline
     ![fullViewCoastlineOutline](https://github.com/user-attachments/assets/b000e2a4-ee1f-4063-b040-6c592e26d376)
-    -Looking at the maldives. Surf report template open.
-![mapPage](https://github.com/user-attachments/assets/aa4d04a0-baf4-4587-afc5-adcfb7b4ac4f)
+    -Looking at Indonesia surf location. Surf report template open.
+![templatePage](https://github.com/user-attachments/assets/76284ee7-cb86-43b4-9d25-0d47a9044110)
+
 
 - Visualisation 
 ![waveVisualisation](https://github.com/user-attachments/assets/f32dfd3c-fd41-43b5-ad0c-a009c3c19c58)
