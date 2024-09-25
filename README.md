@@ -15,7 +15,8 @@ To do list:
   - Look into forcasting. 
   - Get a Mantaray logo.
 
-![Alt text](static/images/homepage.jpg)
+
+![homePage](https://github.com/user-attachments/assets/a1b54f00-9180-4762-bfbd-81f8750894f7)
 
     
   
